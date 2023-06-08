@@ -9,12 +9,15 @@ using eCB_Transport.Data;
 using eCB_Transport.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace eCB_Transport.Controllers
 {
     public class TicketsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        public string Id { get; set; }
 
         public TicketsController(ApplicationDbContext context)
         {
@@ -22,35 +25,27 @@ namespace eCB_Transport.Controllers
         }
 
         // GET: Tickets
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-              return _context.Ticket != null ? 
-                          View(await _context.Ticket.ToListAsync()) :
+            if(User.IsInRole("Customer"))
+            {
+            Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return _context.Ticket != null ? 
+                          View(await _context.Ticket.Where( j => j.Id.ToString() == Id).ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.Ticket'  is null.");
-        }
 
-        // GET: Tickets/Details/5
-        [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null || _context.Ticket == null)
+            }else
             {
-                return NotFound();
-            }
+                return _context.Ticket != null ?
+                              View(await _context.Ticket.ToListAsync()) :
+                              Problem("Entity set 'ApplicationDbContext.Ticket'  is null.");
 
-            var ticket = await _context.Ticket
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
-            {
-                return NotFound();
             }
-
-            return View(ticket);
         }
 
         // GET: Tickets/Create
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -59,14 +54,13 @@ namespace eCB_Transport.Controllers
         // POST: Tickets/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,RouteId,UserId")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
-                ticket.Id = Guid.NewGuid();
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -74,61 +68,34 @@ namespace eCB_Transport.Controllers
             return View(ticket);
         }
 
-        // GET: Tickets/Edit/5
+        // GET: Tickets/Book
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult Book()
         {
-            if (id == null || _context.Ticket == null)
-            {
-                return NotFound();
-            }
-
-            var ticket = await _context.Ticket.FindAsync(id);
-            if (ticket == null)
-            {
-                return NotFound();
-            }
-            return View(ticket);
+            return View();
         }
 
-        // POST: Tickets/Edit/5
+        // POST: Tickets/Book
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = "Customer")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,RouteId,UserId")] Ticket ticket)
+        public async Task<IActionResult> Book([Bind("Id,RouteId,UserId")] Ticket ticket)
         {
-            if (id != ticket.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(ticket);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TicketExists(ticket.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                ticket.UserId = Id;
+                _context.Add(ticket);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(ticket);
         }
 
         // GET: Tickets/Delete/5
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.Ticket == null)
@@ -147,7 +114,7 @@ namespace eCB_Transport.Controllers
         }
 
         // POST: Tickets/Delete/5
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
