@@ -23,6 +23,9 @@ else if (User.IsInRole("Customer"))
     <thead>
         <tr>
             <th>
+                Ticket ID
+            </th>
+            <th>
                 Route ID
             </th>
             @if (User.IsInRole("Administrator"))
@@ -35,16 +38,19 @@ else if (User.IsInRole("Customer"))
     </thead>
     <tbody>
         @foreach (var item in Model) {
-                <tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.RouteId)
-                </td>
-                @if (User.IsInRole("Administrator"))
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.UserId)
                     </td>
-                }
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserId)
+                        </td>
+                    }
                     <td>
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                     </td>

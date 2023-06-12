@@ -1,5 +1,4 @@
-﻿@model eCB_Transport.Models.Ticket
-
+﻿@model eCB_Transport.Models.Route
 @{
     ViewData["Title"] = "Book Now";
 }
@@ -13,7 +12,7 @@
         <form asp-action="Book">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Book Now" class="btn btn-primary"/>
             </div>
         </form>
     </div>

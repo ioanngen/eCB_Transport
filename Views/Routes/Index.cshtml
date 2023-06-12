@@ -19,6 +19,9 @@
                 Route ID
             </th>
             <th>
+               Bus ID
+            </th>
+            <th>
                 Departure
             </th>
             <th>
@@ -67,7 +70,11 @@
                             <a asp-action="Edit" asp-route-id="@item.Id">| Edit |</a> 
                             <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                         }
-                    </td>
+                        else if (User.IsInRole("Customer"))
+                        {
+                          //  <a asp-action="Book" asp-route-id="@item.Id">| Book Now</a>
+                        }
+                </td>
                 </tr>
         }
     </tbody>

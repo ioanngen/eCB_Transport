@@ -9,6 +9,9 @@ using eCB_Transport.Data;
 using eCB_Transport.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using Microsoft.AspNetCore.Components;
+using System.Net.Sockets;
+using System.Security.Claims;
 
 namespace eCB_Transport.Controllers
 {
@@ -70,6 +73,43 @@ namespace eCB_Transport.Controllers
             }
             return View(route);
         }
+
+        /*
+       // GET: Routes/Book
+        [Authorize(Roles = "Customer")]
+        public IActionResult Book()
+        {
+            return View();
+        }
+
+        // POST: Routes/Book
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Customer")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Book([Bind("Id,BusId,Dep,Arr,When,Time,SeatsLeft")] Models.Route route)
+        {
+            if (ModelState.IsValid)
+            {   
+                
+                //Ticket ticket = new Ticket(route.Id);
+                //var result = new TicketsController(_context).Create(ticket);
+                
+
+                var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                Ticket ticket = new()
+                {
+                    UserId = Id,
+                    RouteId = route.Id
+                };
+                _context.Add(ticket);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(route);
+        }
+        */
 
         // GET: Routes/Edit/5
         [Authorize(Roles = "Administrator")]
