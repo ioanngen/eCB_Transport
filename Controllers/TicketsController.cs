@@ -65,13 +65,21 @@ namespace eCB_Transport.Controllers
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                else
+                else if (User.IsInRole("Customer"))
                 {
-                    var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    ticket.UserId = Id;
-                    _context.Add(ticket);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    if (RouteExists(ticket.RouteId))
+                    {
+                        var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        ticket.UserId = Id;
+                        _context.Add(ticket);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        return View("RouteNotFound");
+                    }
+                    
                 }
             }
             return View(ticket);
@@ -119,6 +127,11 @@ namespace eCB_Transport.Controllers
         private bool TicketExists(Guid id)
         {
           return (_context.Ticket?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private bool RouteExists(string id)
+        {
+            return (_context.Route?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

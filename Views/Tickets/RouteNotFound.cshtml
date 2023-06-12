@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewData["Title"] = "RouteNotFound";
+}
+
+<h1>Route Not Found</h1>
+
+<p>
+    The route you typed does not exist.
+</p>
+
+@if (User.IsInRole("Customer"))
+{
+    <div>
+        <a asp-action="Index">Back to My Tickets</a>
+    </div>
+}
+else if (User.IsInRole("Administrator"))
+{
+    <div>
+        <a asp-action="Index">Back to Tickets</a>
+    </div>
+}
