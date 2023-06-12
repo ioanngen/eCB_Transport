@@ -10,14 +10,12 @@ using eCB_Transport.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 
 namespace eCB_Transport.Controllers
 {
     public class TicketsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public string Id { get; set; }
 
         public TicketsController(ApplicationDbContext context)
         {
@@ -28,12 +26,12 @@ namespace eCB_Transport.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            if(User.IsInRole("Customer"))
+            var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (User.IsInRole("Customer"))
             {
-            Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            return _context.Ticket != null ? 
-                          View(await _context.Ticket.Where( j => j.Id.ToString() == Id).ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Ticket'  is null.");
+                return _context.Ticket != null ?
+                          View(await _context.Ticket.Where(j => j.UserId == Id).ToListAsync()) :
+                          Problem("Entity set 'ApplicationDbContext.Route'  is null.");
 
             }else
             {
@@ -45,7 +43,7 @@ namespace eCB_Transport.Controllers
         }
 
         // GET: Tickets/Create
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -54,42 +52,27 @@ namespace eCB_Transport.Controllers
         // POST: Tickets/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,RouteId,UserId")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(ticket);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(ticket);
-        }
-
-        // GET: Tickets/Book
-        [Authorize(Roles = "Customer")]
-        public IActionResult Book()
-        {
-            return View();
-        }
-
-        // POST: Tickets/Book
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Customer")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book([Bind("Id,RouteId,UserId")] Ticket ticket)
-        {
-            if (ModelState.IsValid)
-            {
-                Id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                ticket.UserId = Id;
-                _context.Add(ticket);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (User.IsInRole("Administrator"))
+                {
+                    _context.Add(ticket);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    ticket.UserId = Id;
+                    _context.Add(ticket);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(ticket);
         }

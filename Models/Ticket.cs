@@ -9,10 +9,22 @@
         public Ticket(string ARouteId, string AUserID)
         {
             Id = Guid.NewGuid();
-            RouteId = AUserID;
+            RouteId = ARouteId;
             UserId = AUserID;
         }
 
-        public Ticket() { }
+        public Ticket()
+        {
+            Id = Guid.NewGuid();
+            RouteId = "0";
+            UserId = "0";  
+        }
+
+        public Ticket(string ARouteId)
+        {
+            Id = Guid.NewGuid();
+            RouteId = ARouteId;
+            UserId = "0";
+        }
     }
 }
