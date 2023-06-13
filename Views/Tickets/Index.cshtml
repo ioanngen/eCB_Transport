@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<eCB_Transport.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "My Tickets";
 }
 
-<h1>Index</h1>
+<h1>Tickets</h1>
 
 @if (User.IsInRole("Administrator"))
 {
@@ -52,7 +52,7 @@ else if (User.IsInRole("Customer"))
                         </td>
                     }
                     <td>
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Cancel Reservation</a>
                     </td>
                 </tr>
         }

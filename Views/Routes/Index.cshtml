@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<eCB_Transport.Models.Route>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Routes";
 }
 
-<h1>Index</h1>
+<h1>All Routes</h1>
 
 @if (User.IsInRole("Administrator"))
 {
@@ -33,9 +33,11 @@
             <th>
                 Time
             </th>
+            <!--
             <th>
                 Seats Left
             </th>
+            -->
             <th></th>
         </tr>
     </thead>
@@ -60,9 +62,11 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Time)
                     </td>
+                    <!--
                     <td>
                         @Html.DisplayFor(modelItem => item.SeatsLeft)
                     </td>
+                    -->
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
                         @if (User.IsInRole("Administrator"))
